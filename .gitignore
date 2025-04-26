@@ -55,3 +55,4 @@ nunit-*.xml
 
 *.bak
 .DS_Store
+*.gguf

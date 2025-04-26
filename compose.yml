@@ -9,10 +9,18 @@ services:
       ACCEPT_EULA: "Y"
     volumes:
       - sqlserver_data:/var/opt/mssql
-      - ./scripts:/scripts
+      - ./docker/sqlserver/scripts:/scripts
     entrypoint:
       - /bin/bash
       - /scripts/entrypoint.sh
+
+  llama-cpp:
+    build: ./docker/llama-cpp
+    container_name: llama-cpp
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./docker/llama-cpp/models:/models
 
 volumes:
   sqlserver_data:
