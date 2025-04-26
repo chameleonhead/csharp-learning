@@ -49,20 +49,19 @@
             <!-- テキスト結果 -->
             <TextBlock Name="ResultTextBlock"
                 Grid.Row="0"
-                Text="{Binding Result}"
+                Text="{Binding ResultMessage}"
                 Foreground="LightGray"
                 FontFamily="Consolas"
                 FontSize="13"
+                Padding="10"
                 TextWrapping="Wrap" />
 
             <!-- データグリッド -->
             <DataGrid Name="ResultDataGrid"
                 Grid.Row="1"
-                AutoGenerateColumns="True"
-                GridLinesVisibility="All"
-                Background="White"
-                Foreground="Black"
-                BorderBrush="#444" />
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+                GridLinesVisibility="All" />
         </Grid>
 
     </DockPanel>
