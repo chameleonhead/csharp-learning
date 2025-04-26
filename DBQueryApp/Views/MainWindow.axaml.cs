@@ -62,4 +62,24 @@ public partial class MainWindow : Window
 
         ResultDataGrid.ItemsSource = view;
     }
+
+    private void OnTreeViewDoubleTapped(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (TableTreeView.SelectedItem is TreeNode node)
+        {
+            if (node.Children.Count > 0)
+            {
+                // これはテーブルノード（子を持っている＝テーブル）
+                if (DataContext is MainWindowViewModel vm)
+                {
+                    vm.Query = $"SELECT * FROM [{string.Join("].[", node.Name.Split("."))}]";
+                }
+            }
+            else
+            {
+                // これはカラムノード（子がいない＝カラム）
+                // カラムを選んだときの動作は今は特にしない（必要なら拡張できる）
+            }
+        }
+    }
 }

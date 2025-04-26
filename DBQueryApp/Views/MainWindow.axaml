@@ -13,13 +13,15 @@
         <!-- 左側: テーブルリスト -->
         <Border DockPanel.Dock="Left">
             <TreeView
+                Name="TableTreeView"
                 ItemsSource="{Binding TableTree}"
                 SelectedItem="{Binding SelectedNode, Mode=TwoWay}"
                 Width="250"
-                Margin="5">
+                Margin="5"
+                DoubleTapped="OnTreeViewDoubleTapped">
                 <TreeView.DataTemplates>
                     <TreeDataTemplate DataType="vm:TreeNode" ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Name}" />
+                        <TextBlock Text="{Binding Name}" DoubleTapped="OnTreeViewDoubleTapped" />
                     </TreeDataTemplate>
                 </TreeView.DataTemplates>
             </TreeView>
