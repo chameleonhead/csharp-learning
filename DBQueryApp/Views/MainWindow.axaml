@@ -7,62 +7,78 @@
     x:Class="DBQueryApp.Views.MainWindow"
     x:DataType="vm:MainWindowViewModel"
     Title="SQL Query Tool"
-    Width="1000" Height="700"
-    Background="#1E1E2F">
+    Width="1200" Height="700">
 
     <DockPanel LastChildFill="True">
-
-        <!-- 上部: クエリ入力＋実行ボタン -->
-        <Border DockPanel.Dock="Top" Background="#2C2C3C">
-            <StackPanel>
-                <!-- クエリ入力エリア -->
-                <TextBox Name="QueryTextBox"
-                    Text="{Binding Query, Mode=TwoWay}"
-                    AcceptsReturn="True"
-                    FontFamily="Consolas"
-                    FontSize="14"
-                    Background="#1E1E2F"
-                    Foreground="White"
-                    BorderBrush="#444"
-                    TextWrapping="Wrap"
-                    Height="120" />
-
-                <!-- 実行ボタン -->
-                <Button Name="ExecuteButton"
-                    Command="{Binding ExecuteCommand}"
-                    Content="▶ Execute"
-                    Width="120"
-                    Background="#0078D7"
-                    Foreground="White"
-                    FontWeight="Bold"
-                    Margin="10" />
-            </StackPanel>
+        <!-- 左側: テーブルリスト -->
+        <Border DockPanel.Dock="Left">
+            <TreeView
+                ItemsSource="{Binding TableTree}"
+                SelectedItem="{Binding SelectedNode, Mode=TwoWay}"
+                Width="250"
+                Margin="5">
+                <TreeView.DataTemplates>
+                    <TreeDataTemplate DataType="vm:TreeNode" ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding Name}" />
+                    </TreeDataTemplate>
+                </TreeView.DataTemplates>
+            </TreeView>
         </Border>
 
-        <!-- 中央: 結果表示エリア -->
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+        <!-- 右側: クエリ + 実行 + 結果 -->
+        <DockPanel LastChildFill="True">
 
-            <!-- テキスト結果 -->
-            <TextBlock Name="ResultTextBlock"
-                Grid.Row="0"
-                Text="{Binding ResultMessage}"
-                Foreground="LightGray"
-                FontFamily="Consolas"
-                FontSize="13"
-                Padding="10"
-                TextWrapping="Wrap" />
+            <!-- 上部: クエリ入力＋実行ボタン -->
+            <Border DockPanel.Dock="Top">
+                <StackPanel>
+                    <!-- クエリ入力エリア -->
+                    <TextBox Name="QueryTextBox"
+                        Text="{Binding Query, Mode=TwoWay}"
+                        AcceptsReturn="True"
+                        FontFamily="Consolas"
+                        FontSize="14"
+                        TextWrapping="Wrap"
+                        Height="120"
+                        Margin="5" />
 
-            <!-- データグリッド -->
-            <DataGrid Name="ResultDataGrid"
-                Grid.Row="1"
-                AutoGenerateColumns="False"
-                IsReadOnly="True"
-                GridLinesVisibility="All" />
-        </Grid>
+                    <!-- 実行ボタン -->
+                    <Button Name="ExecuteButton"
+                        Command="{Binding ExecuteCommand}"
+                        Content="▶ Execute"
+                        Width="120"
+                        Background="#0078D7"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        Margin="10" />
+                </StackPanel>
+            </Border>
+
+            <!-- 中央: 結果表示エリア -->
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- テキスト結果 -->
+                <TextBlock Name="ResultTextBlock"
+                    Grid.Row="0"
+                    Text="{Binding ResultMessage}"
+                    Foreground="LightGray"
+                    FontFamily="Consolas"
+                    FontSize="13"
+                    Padding="10"
+                    TextWrapping="Wrap" />
+
+                <!-- データグリッド -->
+                <DataGrid Name="ResultDataGrid"
+                    Grid.Row="1"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    GridLinesVisibility="All" />
+            </Grid>
+
+        </DockPanel>
 
     </DockPanel>
 
