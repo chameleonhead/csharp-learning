@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Dynamic;
 using System.Linq;
-using System.Windows.Input;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using DBQueryApp.Services;
 
 namespace DBQueryApp.ViewModels;
@@ -81,14 +81,16 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public ICommand ExecuteCommand { get; }
+    public RelayCommand ExecuteCommand { get; }
 
     private readonly SqlService _sqlService;
+    private AiService? _mcpService;
+    private Task? _task;
 
     public MainWindowViewModel()
     {
         _sqlService = new SqlService("Server=localhost,1433;User Id=sa;Password=P@ssw0rd;Database=AdventureWorks;Encrypt=False");
-        ExecuteCommand = new RelayCommand(ExecuteQuery);
+        ExecuteCommand = new RelayCommand(ExecuteQuery, () => _task == null || _task.IsCompleted);
         LoadTableTree();
     }
 
@@ -98,6 +100,7 @@ public class MainWindowViewModel : ViewModelBase
         try
         {
             var schema = _sqlService.GetSchema();
+            _mcpService = new AiService(schema);
 
             foreach (var row in schema)
             {
@@ -119,18 +122,53 @@ public class MainWindowViewModel : ViewModelBase
         TableTree = tables.OrderBy(t => t.Name).ToList();
     }
 
-    private void ExecuteQuery()
+    private async void ExecuteQuery()
     {
+        var tcs = new TaskCompletionSource();
+        _task = tcs.Task;
+        ExecuteCommand.RaiseCanExecuteChanged();
         try
         {
-            var result = _sqlService.ExecuteQuery(Query);
-            ResultTable = result.DefaultView;
+            var originalQuery = Query;
+            if (Regex.IsMatch(originalQuery, "^\\s*SELECT"))
+            {
+                if (string.IsNullOrEmpty(originalQuery))
+                {
+                    ResultMessage = $"Error: could not parse query";
+                    ResultTable = null;
+                    tcs.SetResult();
+                    return;
+                }
+                var result = _sqlService.ExecuteQuery(originalQuery);
+                ResultTable = result.DefaultView;
+            }
+            else
+            {
+                var task = _mcpService?.QueryAsync(originalQuery);
+                var sql = task == null ? "" : await task;
+                if (string.IsNullOrEmpty(sql))
+                {
+                    ResultMessage = $"Error: could not parse query";
+                    ResultTable = null;
+                    tcs.SetResult();
+                    return;
+                }
+                var result = _sqlService.ExecuteQuery(sql);
+                ResultTable = result.DefaultView;
+            }
             ResultMessage = $"Success: {ResultTable?.Count ?? 0} rows.";
+            tcs.SetResult();
         }
         catch (Exception ex)
         {
             ResultMessage = $"Error: {ex.Message}";
             ResultTable = null;
+            tcs.SetException(ex);
+        }
+        finally
+        {
+            _task = null;
+            ExecuteCommand.RaiseCanExecuteChanged();
         }
     }
 }

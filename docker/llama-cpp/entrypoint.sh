@@ -14,4 +14,4 @@ else
 fi
 
 # llama.cpp serverモードで起動
-./llama-server -m "${MODEL_DIR}/${MODEL_FILE}" -n 512 --n-gpu-layers 1 --port 8080 --host 0.0.0.0 --ctx-size 4096
+./llama-server -m "${MODEL_DIR}/${MODEL_FILE}" $LLAMA_ARGS --port 8080 --host 0.0.0.0
